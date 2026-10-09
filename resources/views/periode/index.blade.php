@@ -1,368 +1,664 @@
 @extends('layouts.app')
 
-@section('title', 'Kuota Periode')
-
 @section('content')
 
 <div class="page-header">
     <div>
-        <p class="subtitle">Pengelolaan</p>
-        <h1>Kuota Periode</h1>
+        <div class="eyebrow">ADMINISTRASI PKL</div>
+        <h1 class="page-title">Periode PKL</h1>
+        <p class="page-description">
+            Pengaturan periode, unit kerja, dan kapasitas peserta praktik kerja lapangan.
+        </p>
     </div>
 
-    <a href="{{ route('periode.create') }}" class="add-btn">
-        +
+    <a href="{{ route('periode.create') }}" class="btn btn-primary">
+        + Periode Baru
     </a>
 </div>
 
-@if(session('success'))
-    <div class="success">
-        {{ session('success') }}
+{{-- SUMMARY --}}
+<div class="period-summary">
+
+    <div class="period-summary-main">
+        <span class="summary-label">TOTAL PERIODE</span>
+
+        <strong>{{ $periodes->count() }}</strong>
+
+        <small>
+            periode terdaftar dalam sistem
+        </small>
     </div>
-@endif
 
-@if($periodes->count() > 0)
+    <div class="period-summary-side">
+        <span>STATUS</span>
 
-    <div class="period-list">
+        <strong>AKTIF</strong>
 
-        @foreach($periodes as $periode)
+        <small>
+            Manajemen kuota
+        </small>
+    </div>
 
-            @php
-                $terisi = $periode->peserta()
-    ->where('status', 'aktif')
-    ->count();
-                $persentase = $periode->kuota > 0
-                    ? min(($terisi / $periode->kuota) * 100, 100)
-                    : 0;
+</div>
 
-                $penuh = $terisi >= $periode->kuota;
-            @endphp
 
-            <div class="period-card">
+{{-- SECTION --}}
+<div class="section-heading">
+    <div>
+        <span class="section-kicker">DAFTAR PERIODE</span>
+        <h2>Pengelolaan Kuota</h2>
+    </div>
 
-                <div class="card-header">
+    <span class="section-count">
+        {{ $periodes->count() }} periode
+    </span>
+</div>
 
-                    <div>
-                        <h2>{{ $periode->nama_periode }}</h2>
 
-                        <p>
-                            {{ $periode->unit_kerja }}
-                        </p>
-                    </div>
+@if($periodes->count())
 
-                    @if($penuh)
+<div class="period-list">
 
-                        <span class="badge full">
-                            PENUH
-                        </span>
+    @foreach($periodes as $index => $periode)
 
-                    @else
+        @php
+            $terisi = $periode->peserta()
+                ->where('status', 'aktif')
+                ->count();
 
-                        <span class="badge available">
-                            TERSEDIA
-                        </span>
+            $tersedia = max($periode->kuota - $terisi, 0);
 
-                    @endif
+            $persentase = $periode->kuota > 0
+                ? min(($terisi / $periode->kuota) * 100, 100)
+                : 0;
 
+            $isFull = $terisi >= $periode->kuota;
+        @endphp
+
+
+        <article class="period-card">
+
+            {{-- CARD HEADER --}}
+            <div class="period-card-header">
+
+                <div class="period-index">
+                    {{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}
                 </div>
 
-                <div class="date">
-                    {{ \Carbon\Carbon::parse($periode->tanggal_mulai)->format('d M Y') }}
-                    -
-                    {{ \Carbon\Carbon::parse($periode->tanggal_selesai)->format('d M Y') }}
+                <div class="period-title">
+                    <span>PERIODE</span>
+
+                    <h3>
+                        {{ $periode->nama_periode }}
+                    </h3>
                 </div>
 
-                <div class="quota-info">
+                @if($isFull)
+
+                    <span class="quota-status quota-full">
+                        PENUH
+                    </span>
+
+                @else
+
+                    <span class="quota-status quota-available">
+                        TERSEDIA
+                    </span>
+
+                @endif
+
+            </div>
+
+
+            {{-- UNIT KERJA --}}
+            <div class="period-unit">
+
+                <span>UNIT KERJA</span>
+
+                <strong>
+                    {{ $periode->unit_kerja }}
+                </strong>
+
+            </div>
+
+
+            {{-- DATE --}}
+            <div class="period-date">
+
+                <div>
+                    <span>MULAI</span>
+
+                    <strong>
+                        {{ \Carbon\Carbon::parse($periode->tanggal_mulai)->translatedFormat('d M Y') }}
+                    </strong>
+                </div>
+
+                <div class="date-arrow">
+                    →
+                </div>
+
+                <div>
+                    <span>SELESAI</span>
+
+                    <strong>
+                        {{ \Carbon\Carbon::parse($periode->tanggal_selesai)->translatedFormat('d M Y') }}
+                    </strong>
+                </div>
+
+            </div>
+
+
+            {{-- QUOTA --}}
+            <div class="quota-section">
+
+                <div class="quota-header">
 
                     <div>
-                        <span>Kuota terisi</span>
+                        <span>PEMAKAIAN KUOTA</span>
 
                         <strong>
                             {{ $terisi }} / {{ $periode->kuota }}
                         </strong>
                     </div>
 
-                    <span>
-                        {{ round($persentase) }}%
-                    </span>
-
-                </div>
-
-                <div class="progress">
-                    <div
-                        class="progress-bar"
-                        style="width: {{ $persentase }}%">
+                    <div class="quota-number">
+                        {{ number_format($persentase, 0) }}%
                     </div>
+
                 </div>
 
-                <div class="actions">
 
-                    <a
-                        href="{{ route('periode.edit', $periode) }}"
-                        class="edit">
-                        Edit
-                    </a>
+                <div class="quota-track">
 
-                    <form
-                        action="{{ route('periode.destroy', $periode) }}"
-                        method="POST"
-                        onsubmit="return confirm('Yakin ingin menghapus periode ini?')">
+                    <div
+                        class="quota-fill {{ $isFull ? 'quota-fill-full' : '' }}"
+                        style="width: {{ $persentase }}%"
+                    ></div>
 
-                        @csrf
-                        @method('DELETE')
+                </div>
 
-                        <button type="submit" class="delete">
-                            Hapus
-                        </button>
 
-                    </form>
+                <div class="quota-footer">
+
+                    @if($isFull)
+
+                        <span class="quota-warning">
+                            Kuota telah mencapai batas.
+                        </span>
+
+                    @else
+
+                        <span>
+                            Sisa kuota
+                        </span>
+
+                        <strong>
+                            {{ $tersedia }} peserta
+                        </strong>
+
+                    @endif
 
                 </div>
 
             </div>
 
-        @endforeach
 
-    </div>
+            {{-- ACTION --}}
+            <div class="period-actions">
+
+                <a
+                    href="{{ route('periode.edit', $periode) }}"
+                    class="btn btn-outline"
+                >
+                    Edit Periode
+                </a>
+
+                <form
+                    action="{{ route('periode.destroy', $periode) }}"
+                    method="POST"
+                    onsubmit="return confirm('Hapus periode {{ $periode->nama_periode }}? Data peserta yang terhubung dengan periode ini juga akan terhapus.');"
+                >
+                    @csrf
+                    @method('DELETE')
+
+                    <button
+                        type="submit"
+                        class="btn btn-danger-outline"
+                    >
+                        Hapus
+                    </button>
+                </form>
+
+            </div>
+
+        </article>
+
+    @endforeach
+
+</div>
 
 @else
 
-    <div class="empty">
+<div class="empty-state">
 
-        <div class="empty-icon">
-            📋
-        </div>
-
-        <h2>Belum ada periode</h2>
-
-        <p>
-            Tambahkan periode PKL untuk mulai mengatur kuota.
-        </p>
-
-        <a href="{{ route('periode.create') }}">
-            + Tambah Periode
-        </a>
-
+    <div class="empty-mark">
+        PR
     </div>
+
+    <span class="empty-kicker">
+        DATA PERIODE
+    </span>
+
+    <h3>
+        Belum ada periode PKL
+    </h3>
+
+    <p>
+        Buat periode pertama untuk mulai mengatur unit kerja,
+        waktu pelaksanaan, dan kuota peserta.
+    </p>
+
+    <a
+        href="{{ route('periode.create') }}"
+        class="btn btn-primary"
+    >
+        + Tambah Periode
+    </a>
+
+</div>
 
 @endif
 
 
 <style>
 
-.page-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 25px;
-}
+    /* ================================
+       PERIOD SUMMARY
+       ================================ */
 
-.subtitle {
-    color: #6b7280;
-    font-size: 12px;
-    margin-bottom: 4px;
-}
+    .period-summary {
+        display: flex;
+        align-items: stretch;
+        margin: 18px 0 28px;
+        min-height: 112px;
+        border: 1px solid var(--putr-border);
+        background: #fff;
+    }
 
-.page-header h1 {
-    font-size: 24px;
-}
+    .period-summary-main {
+        flex: 1;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
 
-.add-btn {
-    width: 42px;
-    height: 42px;
+    .summary-label {
+        display: block;
+        margin-bottom: 5px;
+        color: var(--putr-muted);
+        font-size: 9px;
+        font-weight: 800;
+        letter-spacing: .13em;
+    }
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    .period-summary-main strong {
+        color: var(--putr-navy);
+        font-size: 34px;
+        line-height: 1;
+        letter-spacing: -.04em;
+    }
 
-    border-radius: 12px;
+    .period-summary-main small {
+        margin-top: 6px;
+        color: var(--putr-muted);
+        font-size: 11px;
+    }
 
-    background: #2563eb;
-    color: white;
+    .period-summary-side {
+        width: 120px;
+        padding: 18px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        background: #F5F7FA;
+        border-left: 1px solid var(--putr-border);
+    }
 
-    font-size: 25px;
-    text-decoration: none;
-}
+    .period-summary-side span {
+        color: var(--putr-muted);
+        font-size: 8px;
+        font-weight: 800;
+        letter-spacing: .12em;
+    }
 
-.success {
-    padding: 12px;
-    background: #dcfce7;
-    color: #166534;
+    .period-summary-side strong {
+        margin-top: 4px;
+        color: #247A45;
+        font-size: 16px;
+    }
 
-    border-radius: 10px;
+    .period-summary-side small {
+        margin-top: 2px;
+        color: var(--putr-muted);
+        font-size: 9px;
+    }
 
-    margin-bottom: 15px;
 
-    font-size: 13px;
-}
+    /* ================================
+       LIST
+       ================================ */
 
-.period-list {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-}
+    .period-list {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
 
-.period-card {
-    border: 1px solid #e5e7eb;
-    border-radius: 16px;
-    padding: 16px;
-}
+    .period-card {
+        overflow: hidden;
+        border: 1px solid var(--putr-border);
+        background: #fff;
+    }
 
-.card-header {
-    display: flex;
-    justify-content: space-between;
-    gap: 10px;
-}
 
-.card-header h2 {
-    font-size: 16px;
-    margin-bottom: 4px;
-}
+    /* ================================
+       HEADER
+       ================================ */
 
-.card-header p {
-    font-size: 12px;
-    color: #6b7280;
-}
+    .period-card-header {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        padding: 15px;
+        border-bottom: 1px solid var(--putr-border);
+    }
 
-.badge {
-    height: fit-content;
+    .period-index {
+        flex: 0 0 34px;
+        width: 34px;
+        height: 34px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--putr-navy);
+        color: #fff;
+        font-size: 10px;
+        font-weight: 800;
+    }
 
-    padding: 5px 8px;
+    .period-title {
+        min-width: 0;
+        flex: 1;
+    }
 
-    border-radius: 6px;
+    .period-title span,
+    .period-unit span,
+    .period-date span,
+    .quota-header span {
+        display: block;
+        margin-bottom: 4px;
+        color: var(--putr-muted);
+        font-size: 8px;
+        font-weight: 800;
+        letter-spacing: .11em;
+    }
 
-    font-size: 9px;
-    font-weight: bold;
-}
+    .period-title h3 {
+        margin: 0;
+        overflow: hidden;
+        color: var(--putr-navy);
+        font-size: 14px;
+        line-height: 1.35;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
 
-.available {
-    background: #dcfce7;
-    color: #15803d;
-}
 
-.full {
-    background: #fee2e2;
-    color: #dc2626;
-}
+    /* ================================
+       STATUS
+       ================================ */
 
-.date {
-    font-size: 11px;
-    color: #6b7280;
+    .quota-status {
+        flex-shrink: 0;
+        padding: 5px 7px;
+        border: 1px solid;
+        font-size: 8px;
+        font-weight: 800;
+        letter-spacing: .08em;
+    }
 
-    margin-top: 15px;
-}
+    .quota-available {
+        border-color: #CBE8D4;
+        background: #EDF7F0;
+        color: #247A45;
+    }
 
-.quota-info {
-    display: flex;
-    justify-content: space-between;
-    align-items: end;
+    .quota-full {
+        border-color: #E8CFCF;
+        background: #FFF4F4;
+        color: #A63D3D;
+    }
 
-    margin-top: 18px;
 
-    font-size: 11px;
-}
+    /* ================================
+       UNIT
+       ================================ */
 
-.quota-info span {
-    color: #6b7280;
-}
+    .period-unit {
+        padding: 13px 15px;
+        border-bottom: 1px solid #EEF1F4;
+    }
 
-.quota-info strong {
-    display: block;
-    color: #111827;
-    font-size: 14px;
-    margin-top: 3px;
-}
+    .period-unit strong {
+        display: block;
+        color: var(--putr-text);
+        font-size: 12px;
+        line-height: 1.4;
+    }
 
-.progress {
-    height: 7px;
 
-    background: #e5e7eb;
+    /* ================================
+       DATE
+       ================================ */
 
-    border-radius: 10px;
+    .period-date {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        align-items: center;
+        gap: 12px;
+        padding: 13px 15px;
+        background: #FAFBFC;
+        border-bottom: 1px solid var(--putr-border);
+    }
 
-    overflow: hidden;
+    .period-date strong {
+        color: var(--putr-navy);
+        font-size: 11px;
+    }
 
-    margin-top: 8px;
-}
+    .date-arrow {
+        color: var(--putr-muted);
+        font-size: 15px;
+    }
 
-.progress-bar {
-    height: 100%;
-    background: #2563eb;
 
-    border-radius: 10px;
-}
+    /* ================================
+       QUOTA
+       ================================ */
 
-.actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 8px;
+    .quota-section {
+        padding: 15px;
+        border-bottom: 1px solid var(--putr-border);
+    }
 
-    margin-top: 15px;
-}
+    .quota-header {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 10px;
+    }
 
-.actions a,
-.actions button {
-    padding: 7px 12px;
+    .quota-header strong {
+        color: var(--putr-navy);
+        font-size: 15px;
+    }
 
-    border-radius: 7px;
+    .quota-number {
+        color: var(--putr-blue);
+        font-size: 13px;
+        font-weight: 800;
+    }
 
-    font-size: 11px;
+    .quota-track {
+        height: 7px;
+        margin-top: 10px;
+        overflow: hidden;
+        background: #E9EDF1;
+    }
 
-    text-decoration: none;
+    .quota-fill {
+        height: 100%;
+        min-width: 2px;
+        background: var(--putr-blue);
+        transition: width .25s ease;
+    }
 
-    cursor: pointer;
-}
+    .quota-fill-full {
+        background: var(--putr-yellow);
+    }
 
-.edit {
-    background: #eff6ff;
-    color: #2563eb;
-}
+    .quota-footer {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        margin-top: 7px;
+        color: var(--putr-muted);
+        font-size: 10px;
+    }
 
-.delete {
-    border: none;
+    .quota-footer strong {
+        color: var(--putr-navy);
+    }
 
-    background: #fef2f2;
-    color: #dc2626;
-}
+    .quota-warning {
+        color: #A63D3D;
+        font-weight: 700;
+    }
 
-.empty {
-    text-align: center;
 
-    padding: 60px 20px;
-}
+    /* ================================
+       ACTION
+       ================================ */
 
-.empty-icon {
-    font-size: 45px;
-    margin-bottom: 15px;
-}
+    .period-actions {
+        display: flex;
+        gap: 8px;
+        padding: 12px 15px;
+    }
 
-.empty h2 {
-    font-size: 18px;
-    margin-bottom: 8px;
-}
+    .period-actions .btn {
+        flex: 1;
+        min-height: 35px;
+        padding: 7px 10px;
+        font-size: 10px;
+    }
 
-.empty p {
-    color: #6b7280;
-    font-size: 13px;
-    line-height: 1.5;
+    .period-actions form {
+        flex: 1;
+        margin: 0;
+    }
 
-    margin-bottom: 20px;
-}
+    .period-actions form .btn {
+        width: 100%;
+    }
 
-.empty a {
-    display: inline-block;
+    .btn-danger-outline {
+        border: 1px solid #E3B9B9;
+        background: #fff;
+        color: #A63D3D;
+        cursor: pointer;
+    }
 
-    padding: 12px 18px;
+    .btn-danger-outline:hover {
+        background: #FFF5F5;
+    }
 
-    background: #2563eb;
-    color: white;
 
-    border-radius: 10px;
+    /* ================================
+       EMPTY
+       ================================ */
 
-    text-decoration: none;
+    .empty-state {
+        margin-top: 16px;
+        padding: 42px 22px;
+        border: 1px solid var(--putr-border);
+        background: #fff;
+        text-align: center;
+    }
 
-    font-size: 13px;
-}
+    .empty-mark {
+        width: 48px;
+        height: 48px;
+        margin: 0 auto 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #F1F4F7;
+        color: var(--putr-navy);
+        font-size: 11px;
+        font-weight: 900;
+        letter-spacing: .08em;
+    }
+
+    .empty-kicker {
+        display: block;
+        margin-bottom: 7px;
+        color: var(--putr-muted);
+        font-size: 9px;
+        font-weight: 800;
+        letter-spacing: .13em;
+    }
+
+    .empty-state h3 {
+        margin: 0;
+        color: var(--putr-navy);
+        font-size: 16px;
+    }
+
+    .empty-state p {
+        max-width: 320px;
+        margin: 8px auto 18px;
+        color: var(--putr-muted);
+        font-size: 11px;
+        line-height: 1.6;
+    }
+
+
+    /* ================================
+       MOBILE
+       ================================ */
+
+    @media (max-width: 360px) {
+
+        .period-card-header {
+            flex-wrap: wrap;
+        }
+
+        .quota-status {
+            margin-left: 45px;
+        }
+
+        .period-actions {
+            flex-wrap: wrap;
+        }
+
+        .period-actions .btn,
+        .period-actions form {
+            flex: 1 1 calc(50% - 4px);
+        }
+
+    }
 
 </style>
 

@@ -4,358 +4,1131 @@
 
 @section('content')
 
-<div class="page-header">
+<div class="peserta-page">
 
-    <div>
-        <p>Pengelolaan</p>
-        <h1>Peserta PKL</h1>
-    </div>
+    {{-- HEADER --}}
+    <header class="page-header">
 
-    <a href="{{ route('peserta.create') }}" class="add-btn">
-        +
-    </a>
+        <div class="page-header-main">
 
-</div>
-<form action="{{ route('peserta.index') }}" method="GET" class="search-form">
+            <a href="{{ url('/') }}" class="back-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M19 12H5"/>
+                    <path d="M12 19l-7-7 7-7"/>
+                </svg>
+            </a>
 
-    <input
-        type="text"
-        name="search"
-        value="{{ request('search') }}"
-        placeholder="Cari nama, institusi, atau jurusan..."
+            <div>
+                <span class="page-kicker">DATA ADMINISTRASI</span>
+
+                <h1>Peserta PKL</h1>
+
+                <p>
+                    Daftar peserta praktik kerja lapangan yang sedang aktif.
+                </p>
+            </div>
+
+        </div>
+
+        <a
+            href="{{ route('peserta.create') }}"
+            class="add-button"
+            aria-label="Tambah peserta"
+        >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+                <path d="M12 5v14"/>
+                <path d="M5 12h14"/>
+            </svg>
+
+            <span>Tambah</span>
+        </a>
+
+    </header>
+
+
+    {{-- SUMMARY STRIP --}}
+    <section class="data-summary">
+
+        <div class="summary-main">
+
+            <span class="summary-label">
+                PESERTA AKTIF
+            </span>
+
+            <strong>
+                {{ $pesertas->count() }}
+            </strong>
+
+        </div>
+
+        <div class="summary-divider"></div>
+
+        <div class="summary-note">
+
+            <span class="summary-dot"></span>
+
+            <span>
+                Sedang melaksanakan PKL
+            </span>
+
+        </div>
+
+    </section>
+
+
+    {{-- SEARCH --}}
+    <form
+        action="{{ route('peserta.index') }}"
+        method="GET"
+        class="search-box"
     >
 
-    <button type="submit">
-        🔍
-    </button>
+        <div class="search-input">
 
-</form>
+            <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+            >
+                <circle cx="11" cy="11" r="7"/>
+                <path d="m20 20-4-4"/>
+            </svg>
 
-@if(session('success'))
-    <div class="success">
-        {{ session('success') }}
-    </div>
-@endif
+            <input
+                type="text"
+                name="search"
+                value="{{ request('search') }}"
+                placeholder="Cari nama, institusi, atau jurusan..."
+                autocomplete="off"
+            >
 
-@if($pesertas->count())
+            @if(request('search'))
 
-    <div class="peserta-list">
+                <a
+                    href="{{ route('peserta.index') }}"
+                    class="clear-search"
+                    aria-label="Hapus pencarian"
+                >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <path d="M6 6l12 12"/>
+                        <path d="M18 6L6 18"/>
+                    </svg>
+                </a>
 
-        @foreach($pesertas as $peserta)
+            @endif
 
-            <div class="peserta-card">
+        </div>
 
-                <div class="top">
 
-                    <div class="avatar">
-                        {{ strtoupper(substr($peserta->nama, 0, 1)) }}
-                    </div>
-
-                    <div class="identity">
-
-                        <h2>
-    <a href="{{ route('peserta.show', $peserta) }}" class="participant-name">
-        {{ $peserta->nama }}
-    </a>
-</h2>
-
-                        <p>{{ $peserta->institusi }}</p>
-
-                    </div>
-
-                    @if($peserta->status === 'aktif')
-
-                        <span class="status aktif">
-                            AKTIF
-                        </span>
-
-                    @else
-
-                        <span class="status selesai">
-                            SELESAI
-                        </span>
-
-                    @endif
-
-                </div>
-
-                <div class="info">
-
-                    <div>
-                        <span>Jurusan</span>
-                        <strong>{{ $peserta->jurusan }}</strong>
-                    </div>
-
-                    <div>
-                        <span>Pembimbing</span>
-                        <strong>{{ $peserta->pembimbing }}</strong>
-                    </div>
-
-                    <div>
-                        <span>Periode</span>
-                        <strong>
-                            {{ $peserta->periode->nama_periode }}
-                        </strong>
-                    </div>
-
-                </div>
-
-                @if($peserta->status === 'aktif')
-
-<div class="action-buttons">
-
-    <a href="{{ route('peserta.edit', $peserta) }}" class="btn-secondary">
-        Edit
-    </a>
-
-    <form
-        action="{{ route('peserta.selesai', $peserta) }}"
-        method="POST"
-        onsubmit="return confirm('Tandai peserta ini sebagai selesai?')">
-
-        @csrf
-        @method('PATCH')
-
-        <button type="submit" class="finish-btn">
-            ✓ Tandai PKL Selesai
+        <button
+            type="submit"
+            class="search-button"
+        >
+            Cari
         </button>
 
     </form>
 
-</div>
 
-                @endif
+    {{-- RESULT INFO --}}
+    <div class="result-bar">
+
+        <span>
+            @if(request('search'))
+                Hasil pencarian untuk
+                <strong>"{{ request('search') }}"</strong>
+            @else
+                Daftar peserta aktif
+            @endif
+        </span>
+
+        <span class="result-count">
+            {{ $pesertas->count() }} data
+        </span>
+
+    </div>
+
+
+    {{-- PESERTA --}}
+    @if($pesertas->count())
+
+        <section class="participant-list">
+
+            @foreach($pesertas as $peserta)
+
+                <article class="participant-card">
+
+                    {{-- CARD HEADER --}}
+                    <div class="participant-top">
+
+                        <div class="participant-identity">
+
+                            <div class="participant-index">
+                                {{ str_pad($loop->iteration, 2, '0', STR_PAD_LEFT) }}
+                            </div>
+
+                            <div class="participant-name">
+
+                                <h2>
+                                    {{ $peserta->nama }}
+                                </h2>
+
+                                <span>
+                                    {{ $peserta->institusi }}
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <span class="active-badge">
+                            AKTIF
+                        </span>
+
+                    </div>
+
+
+                    {{-- DETAIL --}}
+                    <div class="participant-details">
+
+                        <div class="detail-row">
+
+                            <span class="detail-label">
+                                Jurusan
+                            </span>
+
+                            <strong>
+                                {{ $peserta->jurusan }}
+                            </strong>
+
+                        </div>
+
+
+                        <div class="detail-row">
+
+                            <span class="detail-label">
+                                Pembimbing
+                            </span>
+
+                            <strong>
+                                {{ $peserta->pembimbing }}
+                            </strong>
+
+                        </div>
+
+
+                        <div class="detail-row">
+
+                            <span class="detail-label">
+                                Periode
+                            </span>
+
+                            <strong>
+                                {{ $peserta->periode->nama_periode }}
+                            </strong>
+
+                        </div>
+
+
+                        <div class="detail-row">
+
+                            <span class="detail-label">
+                                Pelaksanaan
+                            </span>
+
+                            <strong>
+                                {{ \Carbon\Carbon::parse($peserta->tanggal_mulai)->translatedFormat('d M Y') }}
+                                –
+                                {{ \Carbon\Carbon::parse($peserta->tanggal_selesai)->translatedFormat('d M Y') }}
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                    {{-- ACTION --}}
+                    <div class="participant-actions">
+
+                        <a
+                            href="{{ route('peserta.show', $peserta) }}"
+                            class="detail-button"
+                        >
+                            Lihat Detail
+                        </a>
+
+
+                        <a
+                            href="{{ route('peserta.edit', $peserta) }}"
+                            class="edit-button"
+                        >
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                <path d="M12 20h9"/>
+                                <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4Z"/>
+                            </svg>
+
+                            Edit
+                        </a>
+
+
+                        <form
+                            action="{{ route('peserta.selesai', $peserta) }}"
+                            method="POST"
+                            class="finish-form"
+                            onsubmit="return confirm('Tandai peserta ini sebagai selesai?')"
+                        >
+
+                            @csrf
+                            @method('PATCH')
+
+                            <button
+                                type="submit"
+                                class="finish-button"
+                                title="Tandai selesai"
+                            >
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                    <circle cx="12" cy="12" r="9"/>
+                                    <path d="M8 12l2.5 2.5L16 9"/>
+                                </svg>
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </article>
+
+            @endforeach
+
+        </section>
+
+    @else
+
+        {{-- EMPTY STATE --}}
+
+        <section class="empty-state">
+
+            <div class="empty-state-icon">
+
+                <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.6"
+                >
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                    <circle cx="9" cy="7" r="4"/>
+                    <path d="M19 8v6"/>
+                    <path d="M16 11h6"/>
+                </svg>
 
             </div>
 
-        @endforeach
+            @if(request('search'))
 
-    </div>
+                <h2>
+                    Data tidak ditemukan
+                </h2>
 
-@else
+                <p>
+                    Tidak ada peserta yang sesuai dengan kata pencarian tersebut.
+                </p>
 
-    <div class="empty">
+                <a href="{{ route('peserta.index') }}">
+                    Tampilkan semua peserta
+                </a>
 
-        <div>👥</div>
+            @else
 
-        <h2>Belum ada peserta</h2>
+                <h2>
+                    Belum ada peserta aktif
+                </h2>
 
-        <p>
-            Tambahkan peserta PKL untuk mulai mengelola data.
-        </p>
+                <p>
+                    Data peserta yang sedang melaksanakan PKL akan ditampilkan di sini.
+                </p>
 
-        <a href="{{ route('peserta.create') }}">
-            + Tambah Peserta
-        </a>
+                <a href="{{ route('peserta.create') }}">
+                    Tambah peserta
 
-    </div>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <path d="M12 5v14"/>
+                        <path d="M5 12h14"/>
+                    </svg>
+                </a>
 
-@endif
+            @endif
 
+        </section>
+
+    @endif
+
+</div>
+
+
+@push('styles')
 
 <style>
 
-.page-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 25px;
-}
+    /* =====================================================
+       PAGE
+    ====================================================== */
 
-.page-header p {
-    color: #6b7280;
-    font-size: 12px;
-}
+    .peserta-page {
+        padding-bottom: 8px;
+    }
 
-.page-header h1 {
-    font-size: 24px;
-    margin-top: 4px;
-}
 
-.add-btn {
-    width: 42px;
-    height: 42px;
+    /* =====================================================
+       HEADER
+    ====================================================== */
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    .page-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
 
-    background: #2563eb;
-    color: white;
+        gap: 10px;
 
-    border-radius: 12px;
+        padding-bottom: 17px;
 
-    font-size: 25px;
-    text-decoration: none;
-}
+        margin-bottom: 17px;
 
-.success {
-    padding: 12px;
+        border-bottom: 1px solid var(--border);
+    }
 
-    background: #dcfce7;
-    color: #166534;
 
-    border-radius: 10px;
+    .page-header-main {
+        display: flex;
+        align-items: flex-start;
 
-    font-size: 13px;
+        gap: 9px;
 
-    margin-bottom: 15px;
-}
+        min-width: 0;
+    }
 
-.peserta-list {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-}
 
-.peserta-card {
-    border: 1px solid #e5e7eb;
-    border-radius: 16px;
+    .back-link {
+        width: 30px;
+        height: 30px;
 
-    padding: 16px;
-}
+        flex: 0 0 30px;
 
-.top {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
+        display: flex;
+        align-items: center;
+        justify-content: center;
 
-.avatar {
-    width: 42px;
-    height: 42px;
+        margin-top: 1px;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+        border: 1px solid var(--border);
+        border-radius: 7px;
 
-    background: #eff6ff;
-    color: #2563eb;
+        background: #fff;
 
-    border-radius: 50%;
+        color: var(--text-secondary);
 
-    font-weight: bold;
-}
+        text-decoration: none;
+    }
 
-.identity {
-    flex: 1;
-}
 
-.identity h2 {
-    font-size: 14px;
-}
+    .back-link svg {
+        width: 15px;
+        height: 15px;
+    }
 
-.identity p {
-    color: #6b7280;
-    font-size: 11px;
 
-    margin-top: 3px;
-}
+    .page-kicker {
+        display: block;
 
-.status {
-    padding: 5px 7px;
+        color: var(--putr-blue);
 
-    border-radius: 6px;
+        font-size: 7px;
+        font-weight: 800;
 
-    font-size: 9px;
-    font-weight: bold;
-}
+        letter-spacing: .09em;
+    }
 
-.aktif {
-    background: #dcfce7;
-    color: #15803d;
-}
 
-.selesai {
-    background: #e5e7eb;
-    color: #4b5563;
-}
+    .page-header h1 {
+        margin-top: 3px;
 
-.info {
-    display: grid;
-    gap: 10px;
+        color: var(--putr-navy);
 
-    margin-top: 18px;
-}
+        font-size: 21px;
+        line-height: 1.15;
 
-.info span {
-    display: block;
+        font-weight: 750;
 
-    color: #6b7280;
+        letter-spacing: -.02em;
+    }
 
-    font-size: 10px;
 
-    margin-bottom: 3px;
-}
+    .page-header p {
+        margin-top: 4px;
 
-.info strong {
-    font-size: 12px;
-}
+        color: var(--text-muted);
 
-.finish-btn {
-    width: 100%;
+        font-size: 8px;
+    }
 
-    margin-top: 16px;
 
-    padding: 10px;
+    .add-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
 
-    border: none;
+        gap: 5px;
 
-    background: #eff6ff;
-    color: #2563eb;
+        min-height: 34px;
 
-    border-radius: 9px;
+        padding: 0 10px;
 
-    font-size: 12px;
-    font-weight: 600;
+        flex: 0 0 auto;
 
-    cursor: pointer;
-}
+        border-radius: 7px;
 
-.empty {
-    text-align: center;
-    padding: 60px 20px;
-}
+        background: var(--putr-navy);
 
-.empty > div {
-    font-size: 45px;
-    margin-bottom: 15px;
-}
+        color: #fff;
 
-.empty h2 {
-    font-size: 18px;
-}
+        font-size: 9px;
+        font-weight: 650;
 
-.empty p {
-    color: #6b7280;
-    font-size: 13px;
-    margin: 8px 0 20px;
-}
+        text-decoration: none;
+    }
 
-.empty a {
-    display: inline-block;
 
-    padding: 12px 18px;
+    .add-button svg {
+        width: 13px;
+        height: 13px;
+    }
 
-    background: #2563eb;
-    color: white;
 
-    border-radius: 10px;
+    /* =====================================================
+       DATA SUMMARY
+    ====================================================== */
 
-    text-decoration: none;
+    .data-summary {
+        display: flex;
+        align-items: center;
 
-    font-size: 13px;
-}
+        min-height: 61px;
 
-.participant-name {
-    color: #1e293b;
-    text-decoration: none;
-}
+        margin-bottom: 15px;
 
-.participant-name:hover {
-    text-decoration: underline;
-}
+        padding: 11px 13px;
+
+        background: #fff;
+
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--putr-yellow);
+
+        border-radius: 8px;
+
+        box-shadow:
+            0 3px 8px rgba(16, 42, 67, .025);
+    }
+
+
+    .summary-main {
+        display: flex;
+        flex-direction: column;
+
+        gap: 1px;
+    }
+
+
+    .summary-label {
+        color: var(--text-muted);
+
+        font-size: 7px;
+        font-weight: 800;
+
+        letter-spacing: .07em;
+    }
+
+
+    .summary-main strong {
+        color: var(--putr-navy);
+
+        font-size: 20px;
+        line-height: 1;
+
+        font-weight: 760;
+    }
+
+
+    .summary-divider {
+        width: 1px;
+        height: 28px;
+
+        margin: 0 13px;
+
+        background: var(--border);
+    }
+
+
+    .summary-note {
+        display: flex;
+        align-items: center;
+
+        gap: 6px;
+
+        color: var(--text-secondary);
+
+        font-size: 8px;
+    }
+
+
+    .summary-dot {
+        width: 6px;
+        height: 6px;
+
+        border-radius: 50%;
+
+        background: var(--success);
+
+        box-shadow:
+            0 0 0 3px var(--success-bg);
+    }
+
+
+    /* =====================================================
+       SEARCH
+    ====================================================== */
+
+    .search-box {
+        display: flex;
+
+        gap: 6px;
+
+        margin-bottom: 10px;
+    }
+
+
+    .search-input {
+        position: relative;
+
+        flex: 1;
+
+        min-width: 0;
+    }
+
+
+    .search-input > svg {
+        position: absolute;
+
+        left: 11px;
+        top: 50%;
+
+        width: 14px;
+        height: 14px;
+
+        transform: translateY(-50%);
+
+        color: var(--text-muted);
+
+        pointer-events: none;
+    }
+
+
+    .search-input input {
+        width: 100%;
+
+        height: 39px;
+
+        padding: 0 33px;
+
+        border: 1px solid var(--border);
+        border-radius: 7px;
+
+        background: #fff;
+
+        color: var(--text);
+
+        font-size: 10px;
+
+        outline: none;
+    }
+
+
+    .search-input input::placeholder {
+        color: #9FB3C8;
+    }
+
+
+    .search-input input:focus {
+        border-color: var(--putr-blue);
+
+        box-shadow:
+            0 0 0 3px rgba(23, 105, 170, .07);
+    }
+
+
+    .clear-search {
+        position: absolute;
+
+        right: 8px;
+        top: 50%;
+
+        width: 20px;
+        height: 20px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        transform: translateY(-50%);
+
+        color: var(--text-muted);
+    }
+
+
+    .clear-search svg {
+        width: 12px;
+        height: 12px;
+    }
+
+
+    .search-button {
+        width: 43px;
+        height: 39px;
+
+        border: 0;
+        border-radius: 7px;
+
+        background: var(--putr-navy);
+
+        color: #fff;
+
+        font-size: 9px;
+        font-weight: 650;
+
+        cursor: pointer;
+    }
+
+
+    /* =====================================================
+       RESULT BAR
+    ====================================================== */
+
+    .result-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        gap: 10px;
+
+        margin-bottom: 8px;
+
+        color: var(--text-muted);
+
+        font-size: 8px;
+    }
+
+
+    .result-bar strong {
+        color: var(--text-secondary);
+
+        font-weight: 700;
+    }
+
+
+    .result-count {
+        flex: 0 0 auto;
+
+        color: var(--putr-blue);
+
+        font-weight: 700;
+    }
+
+
+    /* =====================================================
+       PARTICIPANT CARD
+    ====================================================== */
+
+    .participant-list {
+        display: grid;
+
+        gap: 8px;
+    }
+
+
+    .participant-card {
+        background: #fff;
+
+        border: 1px solid var(--border);
+
+        border-radius: 9px;
+
+        overflow: hidden;
+
+        box-shadow:
+            0 3px 9px rgba(16, 42, 67, .025);
+    }
+
+
+    .participant-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+
+        gap: 10px;
+
+        padding: 13px 13px 11px;
+    }
+
+
+    .participant-identity {
+        display: flex;
+        align-items: flex-start;
+
+        gap: 9px;
+
+        min-width: 0;
+    }
+
+
+    .participant-index {
+        width: 27px;
+        height: 27px;
+
+        flex: 0 0 27px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        background: #EDF3F8;
+
+        color: var(--putr-blue);
+
+        border-radius: 6px;
+
+        font-size: 8px;
+        font-weight: 800;
+
+        letter-spacing: .02em;
+    }
+
+
+    .participant-name {
+        min-width: 0;
+    }
+
+
+    .participant-name h2 {
+        overflow: hidden;
+
+        color: var(--text);
+
+        font-size: 11px;
+        line-height: 1.3;
+
+        font-weight: 720;
+
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+
+    .participant-name span {
+        display: block;
+
+        overflow: hidden;
+
+        margin-top: 2px;
+
+        color: var(--text-secondary);
+
+        font-size: 8px;
+
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+
+    .active-badge {
+        flex: 0 0 auto;
+
+        padding: 4px 6px;
+
+        background: var(--success-bg);
+
+        color: var(--success);
+
+        border-radius: 4px;
+
+        font-size: 6px;
+        font-weight: 800;
+
+        letter-spacing: .045em;
+    }
+
+
+    /* =====================================================
+       DETAILS
+    ====================================================== */
+
+    .participant-details {
+        padding: 0 13px;
+
+        border-top: 1px solid #EEF2F5;
+        border-bottom: 1px solid #EEF2F5;
+    }
+
+
+    .detail-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        gap: 12px;
+
+        min-height: 30px;
+
+        border-bottom: 1px solid #F0F3F6;
+    }
+
+
+    .detail-row:last-child {
+        border-bottom: 0;
+    }
+
+
+    .detail-label {
+        flex: 0 0 auto;
+
+        color: var(--text-muted);
+
+        font-size: 8px;
+    }
+
+
+    .detail-row strong {
+        max-width: 66%;
+
+        overflow: hidden;
+
+        color: var(--text-secondary);
+
+        font-size: 8px;
+        font-weight: 650;
+
+        text-align: right;
+
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+
+    /* =====================================================
+       ACTION
+    ====================================================== */
+
+    .participant-actions {
+        display: flex;
+        align-items: center;
+
+        gap: 6px;
+
+        padding: 9px 13px;
+    }
+
+
+    .detail-button,
+    .edit-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        min-height: 29px;
+
+        padding: 0 9px;
+
+        border-radius: 6px;
+
+        font-size: 8px;
+        font-weight: 650;
+
+        text-decoration: none;
+    }
+
+
+    .detail-button {
+        flex: 1;
+
+        background: #F1F5F8;
+
+        color: var(--text-secondary);
+
+        border: 1px solid #E1E8EE;
+    }
+
+
+    .edit-button {
+        gap: 4px;
+
+        background: #EDF4FA;
+
+        color: var(--putr-blue);
+
+        border: 1px solid #D9E7F2;
+    }
+
+
+    .edit-button svg {
+        width: 11px;
+        height: 11px;
+    }
+
+
+    .finish-form {
+        margin: 0;
+    }
+
+
+    .finish-button {
+        width: 29px;
+        height: 29px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border: 1px solid #D4E9DA;
+        border-radius: 6px;
+
+        background: var(--success-bg);
+
+        color: var(--success);
+
+        cursor: pointer;
+    }
+
+
+    .finish-button svg {
+        width: 13px;
+        height: 13px;
+    }
+
+
+    /* =====================================================
+       EMPTY
+    ====================================================== */
+
+    .empty-state {
+        padding: 34px 18px;
+
+        text-align: center;
+
+        background: #fff;
+
+        border: 1px dashed #B8C7D6;
+
+        border-radius: 10px;
+    }
+
+
+    .empty-state-icon {
+        width: 43px;
+        height: 43px;
+
+        margin: 0 auto 11px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 8px;
+
+        background: #EDF2F6;
+
+        color: var(--text-secondary);
+    }
+
+
+    .empty-state-icon svg {
+        width: 20px;
+        height: 20px;
+    }
+
+
+    .empty-state h2 {
+        color: var(--text);
+
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+
+    .empty-state p {
+        max-width: 270px;
+
+        margin: 5px auto 12px;
+
+        color: var(--text-muted);
+
+        font-size: 9px;
+    }
+
+
+    .empty-state a {
+        display: inline-flex;
+        align-items: center;
+
+        gap: 4px;
+
+        color: var(--putr-blue);
+
+        font-size: 9px;
+        font-weight: 700;
+
+        text-decoration: none;
+    }
+
+
+    .empty-state a svg {
+        width: 11px;
+        height: 11px;
+    }
+
+
+    /* =====================================================
+       SMALL SCREEN
+    ====================================================== */
+
+    @media (max-width: 360px) {
+
+        .page-header h1 {
+            font-size: 19px;
+        }
+
+        .add-button span {
+            display: none;
+        }
+
+        .add-button {
+            width: 34px;
+            padding: 0;
+        }
+
+        .participant-actions {
+            gap: 5px;
+        }
+
+        .detail-button,
+        .edit-button {
+            padding-left: 7px;
+            padding-right: 7px;
+        }
+
+    }
 
 </style>
+
+@endpush
 
 @endsection

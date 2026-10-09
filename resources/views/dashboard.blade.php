@@ -4,351 +4,1410 @@
 
 @section('content')
 
-<div class="header">
-    <div>
-        <p class="welcome">Selamat datang 👋</p>
-        <h1>Monitor PKL PUPR</h1>
-    </div>
+<div class="dashboard">
 
-    <div class="profile">
-        A
-    </div>
-</div>
+    {{-- =====================================================
+        HEADER
+    ====================================================== --}}
 
-<div class="stats">
+    <header class="dashboard-header">
 
-    <div class="stat-card">
-        <span class="icon blue">👥</span>
-        <p>PKL Aktif</p>
-        <h2>{{ $pesertaAktif }}</h2>
-    </div>
+        <div class="brand-section">
 
-    <div class="stat-card">
-        <span class="icon green">✓</span>
-        <p>PKL Selesai</p>
-        <h2>{{ $pesertaSelesai }}</h2>
-    </div>
+            <div class="institution-mark">
+                <span>PU</span>
+            </div>
 
-</div>
+            <div class="institution-info">
+                <span class="institution-name">
+                    DINAS PEKERJAAN UMUM
+                </span>
 
-<div class="section-header">
-    <h2>Aksi Cepat</h2>
-</div>
+                <span class="institution-subtitle">
+                    DAN TATA RUANG
+                </span>
+            </div>
 
-<div class="quick-actions">
-
-    <a href="#" class="action-card">
-        <span>＋</span>
-        <div>
-            <strong>Tambah Peserta</strong>
-            <small>Daftarkan peserta PKL baru</small>
         </div>
-    </a>
 
-    <a href="#" class="action-card">
-        <span>＋</span>
-        <div>
-            <strong>Tambah Periode</strong>
-            <small>Buat periode PKL baru</small>
+
+        <div class="system-status">
+
+            <span class="status-indicator"></span>
+
+            <span>Sistem Aktif</span>
+
         </div>
-    </a>
 
-</div>
+    </header>
 
-<div class="section-header">
-    <h2>Periode PKL</h2>
-    <a href="#">Lihat semua</a>
-</div>
 
-@foreach($periodes as $periode)
+    {{-- =====================================================
+        PAGE INTRO
+    ====================================================== --}}
 
-    @php
-        $terisi = $periode->peserta_aktif_count;
+    <section class="page-intro">
 
-        $persentase = $periode->kuota > 0
-            ? min(($terisi / $periode->kuota) * 100, 100)
-            : 0;
+        <div>
 
-        $penuh = $terisi >= $periode->kuota;
-    @endphp
+            <span class="eyebrow">
+                SISTEM MONITORING
+            </span>
 
-    <div class="period-card">
+            <h1>
+                Monitor PKL
+            </h1>
 
-        <div class="period-top">
+            <p>
+                Pengelolaan dan monitoring peserta praktik kerja lapangan.
+            </p>
+
+        </div>
+
+    </section>
+
+
+    {{-- =====================================================
+        SUMMARY
+    ====================================================== --}}
+
+    <section class="summary-section">
+
+        <div class="section-heading">
 
             <div>
-                <strong>{{ $periode->nama_periode }}</strong>
 
-                <small>{{ $periode->unit_kerja }}</small>
+                <span class="section-kicker">
+                    RINGKASAN
+                </span>
+
+                <h2>
+                    Kondisi Peserta
+                </h2>
+
             </div>
 
-            @if($penuh)
-                <span class="badge full">
-                    PENUH
-                </span>
-            @else
-                <span class="badge">
-                    TERSEDIA
-                </span>
-            @endif
+            <span class="data-label">
+                DATA TERKINI
+            </span>
 
         </div>
 
-        <div class="quota">
 
-            <div class="quota-text">
+        <div class="summary-grid">
 
-                <span>Kuota terisi</span>
 
-                <strong>
-                    {{ $terisi }} / {{ $periode->kuota }}
-                </strong>
+            {{-- AKTIF --}}
 
-            </div>
+            <div class="summary-card active-card">
 
-            <div class="progress">
+                <div class="summary-card-top">
 
-                <div
-                    class="progress-bar"
-                    style="width: {{ $persentase }}%">
+                    <div class="summary-icon">
+
+                        <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.8"
+                        >
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                            <circle cx="9" cy="7" r="4"/>
+                            <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                        </svg>
+
+                    </div>
+
+                    <span class="summary-status">
+                        AKTIF
+                    </span>
+
                 </div>
 
+
+                <div class="summary-number">
+                    {{ $pesertaAktif }}
+                </div>
+
+
+                <div class="summary-label">
+                    Peserta sedang PKL
+                </div>
+
+
+                <div class="summary-line"></div>
+
+            </div>
+
+
+            {{-- SELESAI --}}
+
+            <div class="summary-card completed-card">
+
+                <div class="summary-card-top">
+
+                    <div class="summary-icon">
+
+                        <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.8"
+                        >
+                            <circle cx="12" cy="12" r="9"/>
+                            <path d="M8 12l2.5 2.5L16 9"/>
+                        </svg>
+
+                    </div>
+
+                    <span class="summary-status">
+                        SELESAI
+                    </span>
+
+                </div>
+
+
+                <div class="summary-number">
+                    {{ $pesertaSelesai }}
+                </div>
+
+
+                <div class="summary-label">
+                    Peserta telah selesai
+                </div>
+
+
+                <div class="summary-line"></div>
+
             </div>
 
         </div>
 
-    </div>
+    </section>
 
-@endforeach
 
-@endsection
+    {{-- =====================================================
+        QUICK ACTION
+    ====================================================== --}}
+
+    <section class="action-section">
+
+        <div class="section-heading">
+
+            <div>
+
+                <span class="section-kicker">
+                    AKSES CEPAT
+                </span>
+
+                <h2>
+                    Kelola Data
+                </h2>
+
+            </div>
+
+        </div>
+
+
+        <div class="action-list">
+
+
+            {{-- TAMBAH PESERTA --}}
+
+            <a
+                href="{{ route('peserta.create') }}"
+                class="action-item"
+            >
+
+                <div class="action-icon blue">
+
+                    <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                    >
+                        <path d="M12 5v14"/>
+                        <path d="M5 12h14"/>
+                    </svg>
+
+                </div>
+
+
+                <div class="action-content">
+
+                    <strong>
+                        Tambah Peserta
+                    </strong>
+
+                    <span>
+                        Daftarkan peserta PKL baru
+                    </span>
+
+                </div>
+
+
+                <svg
+                    class="action-arrow"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                >
+                    <path d="M9 18l6-6-6-6"/>
+                </svg>
+
+            </a>
+
+
+            {{-- TAMBAH PERIODE --}}
+
+            <a
+                href="{{ route('periode.create') }}"
+                class="action-item"
+            >
+
+                <div class="action-icon yellow">
+
+                    <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                    >
+                        <rect x="3" y="4" width="18" height="17" rx="2"/>
+                        <path d="M16 2v4"/>
+                        <path d="M8 2v4"/>
+                        <path d="M3 10h18"/>
+                    </svg>
+
+                </div>
+
+
+                <div class="action-content">
+
+                    <strong>
+                        Tambah Periode
+                    </strong>
+
+                    <span>
+                        Buat periode PKL baru
+                    </span>
+
+                </div>
+
+
+                <svg
+                    class="action-arrow"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                >
+                    <path d="M9 18l6-6-6-6"/>
+                </svg>
+
+            </a>
+
+        </div>
+
+    </section>
+
+
+    {{-- =====================================================
+        PERIODE PKL
+    ====================================================== --}}
+
+    <section class="period-section">
+
+        <div class="section-heading period-heading">
+
+            <div>
+
+                <span class="section-kicker">
+                    MONITORING KAPASITAS
+                </span>
+
+                <h2>
+                    Periode PKL
+                </h2>
+
+            </div>
+
+
+            <a
+                href="{{ route('periode.index') }}"
+                class="view-all"
+            >
+                Lihat semua
+            </a>
+
+        </div>
+
+
+        @if($periodes->count())
+
+            <div class="period-list">
+
+                @foreach($periodes as $periode)
+
+                    @php
+
+                        $terisi = $periode->peserta_aktif_count;
+
+                        $persentase = $periode->kuota > 0
+                            ? min(($terisi / $periode->kuota) * 100, 100)
+                            : 0;
+
+                        $penuh = $terisi >= $periode->kuota;
+
+                    @endphp
+
+
+                    <article class="period-card">
+
+
+                        <div class="period-card-header">
+
+                            <div class="period-title">
+
+                                <h3>
+                                    {{ $periode->nama_periode }}
+                                </h3>
+
+                                <span>
+                                    {{ $periode->unit_kerja }}
+                                </span>
+
+                            </div>
+
+
+                            @if($penuh)
+
+                                <span class="availability full">
+                                    PENUH
+                                </span>
+
+                            @else
+
+                                <span class="availability available">
+                                    TERSEDIA
+                                </span>
+
+                            @endif
+
+                        </div>
+
+
+                        <div class="period-meta">
+
+                            <div>
+
+                                <span>
+                                    Kapasitas
+                                </span>
+
+                                <strong>
+                                    {{ $terisi }} / {{ $periode->kuota }}
+                                </strong>
+
+                            </div>
+
+
+                            <strong class="percentage">
+                                {{ round($persentase) }}%
+                            </strong>
+
+                        </div>
+
+
+                        <div class="progress-track">
+
+                            <div
+                                class="progress-value {{ $penuh ? 'danger' : '' }}"
+                                style="width: {{ $persentase }}%"
+                            ></div>
+
+                        </div>
+
+
+                        <div class="period-footer">
+
+                            <span>
+                                {{ $penuh
+                                    ? 'Kuota periode telah terpenuhi'
+                                    : ($periode->kuota - $terisi) . ' kuota masih tersedia'
+                                }}
+                            </span>
+
+                        </div>
+
+                    </article>
+
+                @endforeach
+
+            </div>
+
+        @else
+
+            <div class="empty-period">
+
+                <div class="empty-icon">
+
+                    <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.7"
+                    >
+                        <rect x="3" y="4" width="18" height="17" rx="2"/>
+                        <path d="M16 2v4"/>
+                        <path d="M8 2v4"/>
+                        <path d="M3 10h18"/>
+                    </svg>
+
+                </div>
+
+
+                <strong>
+                    Belum ada periode PKL
+                </strong>
+
+                <p>
+                    Tambahkan periode untuk mulai mengelola kapasitas peserta.
+                </p>
+
+
+                <a href="{{ route('periode.create') }}">
+                    Tambah Periode
+                </a>
+
+            </div>
+
+        @endif
+
+    </section>
+
+</div>
+
 
 @push('styles')
+
 <style>
 
-    .header {
+    /* =====================================================
+       DASHBOARD
+    ====================================================== */
+
+    .dashboard {
+        padding-bottom: 8px;
+    }
+
+
+    /* =====================================================
+       HEADER
+    ====================================================== */
+
+    .dashboard-header {
+
         display: flex;
+        align-items: center;
         justify-content: space-between;
-        align-items: center;
-        margin-bottom: 24px;
+
+        padding-bottom: 17px;
+
+        margin-bottom: 20px;
+
+        border-bottom: 1px solid var(--border);
+
     }
 
-    .welcome {
-        font-size: 13px;
-        color: #6b7280;
-        margin-bottom: 5px;
-    }
 
-    .header h1 {
-        font-size: 22px;
-    }
+    .brand-section {
 
-    .profile {
-        width: 42px;
-        height: 42px;
-        border-radius: 50%;
-        background: #2563eb;
-        color: white;
         display: flex;
-        justify-content: center;
         align-items: center;
-        font-weight: bold;
+
+        gap: 10px;
+
     }
 
-    .stats {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 12px;
-        margin-bottom: 28px;
-    }
 
-    .stat-card {
-        padding: 18px;
-        border: 1px solid #e5e7eb;
-        border-radius: 16px;
-    }
+    .institution-mark {
 
-    .stat-card p {
-        font-size: 13px;
-        color: #6b7280;
-        margin: 12px 0 5px;
-    }
-
-    .stat-card h2 {
-        font-size: 28px;
-    }
-
-    .icon {
-        display: inline-flex;
         width: 36px;
         height: 36px;
-        align-items: center;
-        justify-content: center;
-        border-radius: 10px;
-    }
 
-    .blue {
-        background: #eff6ff;
-    }
-
-    .green {
-        background: #ecfdf5;
-    }
-
-    .section-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin: 24px 0 12px;
-    }
-
-    .section-header h2 {
-        font-size: 17px;
-    }
-
-    .section-header a {
-        color: #2563eb;
-        font-size: 13px;
-        text-decoration: none;
-    }
-
-    .quick-actions {
-        display: grid;
-        gap: 10px;
-    }
-
-    .action-card {
-        display: flex;
-        align-items: center;
-        gap: 14px;
-        padding: 15px;
-        border: 1px solid #e5e7eb;
-        border-radius: 14px;
-        text-decoration: none;
-        color: #111827;
-    }
-
-    .action-card > span {
-        width: 38px;
-        height: 38px;
         display: flex;
         align-items: center;
         justify-content: center;
-        background: #eff6ff;
-        color: #2563eb;
-        border-radius: 10px;
-        font-size: 22px;
+
+        background: var(--putr-navy);
+
+        color: var(--putr-yellow);
+
+        border-radius: 7px;
+
+        font-size: 10px;
+        font-weight: 800;
+
+        letter-spacing: -.03em;
+
+        border-bottom: 3px solid var(--putr-yellow);
+
     }
 
-    .action-card strong {
+
+    .institution-info {
+
+        display: flex;
+        flex-direction: column;
+
+        line-height: 1.15;
+
+    }
+
+
+    .institution-name {
+
+        color: var(--putr-navy);
+
+        font-size: 9px;
+        font-weight: 800;
+
+        letter-spacing: .055em;
+
+    }
+
+
+    .institution-subtitle {
+
+        margin-top: 3px;
+
+        color: var(--text-muted);
+
+        font-size: 8px;
+        font-weight: 550;
+
+        letter-spacing: .04em;
+
+    }
+
+
+    .system-status {
+
+        display: flex;
+        align-items: center;
+
+        gap: 5px;
+
+        padding: 5px 7px;
+
+        background: #F1F8F4;
+
+        border: 1px solid #D5ECDD;
+
+        border-radius: 5px;
+
+        color: var(--success);
+
+        font-size: 8px;
+        font-weight: 650;
+
+    }
+
+
+    .status-indicator {
+
+        width: 5px;
+        height: 5px;
+
+        border-radius: 50%;
+
+        background: var(--success);
+
+    }
+
+
+    /* =====================================================
+       PAGE INTRO
+    ====================================================== */
+
+    .page-intro {
+
+        margin-bottom: 25px;
+
+    }
+
+
+    .eyebrow,
+    .section-kicker {
+
         display: block;
-        font-size: 14px;
-        margin-bottom: 3px;
+
+        color: var(--putr-blue);
+
+        font-size: 8px;
+        font-weight: 800;
+
+        letter-spacing: .095em;
+
     }
 
-    .action-card small {
-        color: #6b7280;
-        font-size: 11px;
+
+    .page-intro h1 {
+
+        margin-top: 5px;
+
+        color: var(--putr-navy);
+
+        font-size: 26px;
+        line-height: 1.1;
+
+        font-weight: 760;
+
+        letter-spacing: -.025em;
+
     }
+
+
+    .page-intro p {
+
+        max-width: 290px;
+
+        margin-top: 6px;
+
+        color: var(--text-secondary);
+
+        font-size: 10px;
+
+    }
+
+
+    /* =====================================================
+       SECTION HEADING
+    ====================================================== */
+
+    .section-heading {
+
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+
+        gap: 10px;
+
+        margin-bottom: 10px;
+
+    }
+
+
+    .section-heading h2 {
+
+        margin-top: 3px;
+
+        color: var(--text);
+
+        font-size: 15px;
+        line-height: 1.2;
+
+        font-weight: 720;
+
+    }
+
+
+    .data-label {
+
+        color: var(--text-muted);
+
+        font-size: 7px;
+        font-weight: 700;
+
+        letter-spacing: .06em;
+
+    }
+
+
+    /* =====================================================
+       SUMMARY
+    ====================================================== */
+
+    .summary-section {
+
+        margin-bottom: 25px;
+
+    }
+
+
+    .summary-grid {
+
+        display: grid;
+
+        grid-template-columns: 1fr 1fr;
+
+        gap: 9px;
+
+    }
+
+
+    .summary-card {
+
+        position: relative;
+
+        min-height: 139px;
+
+        overflow: hidden;
+
+        padding: 14px;
+
+        background: #fff;
+
+        border: 1px solid var(--border);
+
+        border-radius: 10px;
+
+        box-shadow:
+            0 3px 9px rgba(16, 42, 67, .035);
+
+    }
+
+
+    .summary-card::after {
+
+        content: "";
+
+        position: absolute;
+
+        right: -27px;
+        bottom: -30px;
+
+        width: 80px;
+        height: 80px;
+
+        border-radius: 50%;
+
+        opacity: .7;
+
+    }
+
+
+    .active-card::after {
+
+        background: #E7F0F8;
+
+    }
+
+
+    .completed-card::after {
+
+        background: #EAF5ED;
+
+    }
+
+
+    .summary-card-top {
+
+        position: relative;
+        z-index: 1;
+
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+    }
+
+
+    .summary-icon {
+
+        width: 31px;
+        height: 31px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 7px;
+
+        background: #EDF4FA;
+
+        color: var(--putr-blue);
+
+    }
+
+
+    .completed-card .summary-icon {
+
+        background: #EDF7F0;
+
+        color: var(--success);
+
+    }
+
+
+    .summary-icon svg {
+
+        width: 16px;
+        height: 16px;
+
+    }
+
+
+    .summary-status {
+
+        color: var(--text-muted);
+
+        font-size: 7px;
+        font-weight: 800;
+
+        letter-spacing: .07em;
+
+    }
+
+
+    .summary-number {
+
+        position: relative;
+        z-index: 1;
+
+        margin-top: 19px;
+
+        color: var(--putr-navy);
+
+        font-size: 28px;
+        line-height: 1;
+
+        font-weight: 760;
+
+        letter-spacing: -.035em;
+
+    }
+
+
+    .summary-label {
+
+        position: relative;
+        z-index: 1;
+
+        margin-top: 5px;
+
+        color: var(--text-secondary);
+
+        font-size: 9px;
+
+    }
+
+
+    .summary-line {
+
+        position: absolute;
+
+        left: 14px;
+        bottom: 14px;
+
+        width: 24px;
+        height: 2px;
+
+        background: var(--putr-yellow);
+
+        border-radius: 2px;
+
+    }
+
+
+    .completed-card .summary-line {
+
+        background: #78B98D;
+
+    }
+
+
+    /* =====================================================
+       QUICK ACTION
+    ====================================================== */
+
+    .action-section {
+
+        margin-bottom: 27px;
+
+    }
+
+
+    .action-list {
+
+        display: grid;
+
+        gap: 7px;
+
+    }
+
+
+    .action-item {
+
+        display: flex;
+        align-items: center;
+
+        min-height: 57px;
+
+        padding: 9px 11px;
+
+        background: #fff;
+
+        border: 1px solid var(--border);
+
+        border-radius: 9px;
+
+        text-decoration: none;
+
+        transition:
+            border-color .15s ease,
+            transform .15s ease,
+            box-shadow .15s ease;
+
+    }
+
+
+    .action-item:hover {
+
+        border-color: #B8C7D6;
+
+        transform: translateY(-1px);
+
+        box-shadow:
+            0 5px 13px rgba(16, 42, 67, .055);
+
+    }
+
+
+    .action-icon {
+
+        width: 34px;
+        height: 34px;
+
+        flex: 0 0 34px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 7px;
+
+    }
+
+
+    .action-icon.blue {
+
+        background: #EAF2F9;
+
+        color: var(--putr-blue);
+
+    }
+
+
+    .action-icon.yellow {
+
+        background: #FFF6D9;
+
+        color: #936F00;
+
+    }
+
+
+    .action-icon svg {
+
+        width: 17px;
+        height: 17px;
+
+    }
+
+
+    .action-content {
+
+        min-width: 0;
+
+        margin-left: 10px;
+
+    }
+
+
+    .action-content strong {
+
+        display: block;
+
+        color: var(--text);
+
+        font-size: 10px;
+        font-weight: 700;
+
+    }
+
+
+    .action-content span {
+
+        display: block;
+
+        margin-top: 2px;
+
+        color: var(--text-muted);
+
+        font-size: 8px;
+
+    }
+
+
+    .action-arrow {
+
+        width: 14px;
+        height: 14px;
+
+        margin-left: auto;
+
+        color: #9FB3C8;
+
+    }
+
+
+    /* =====================================================
+       PERIOD
+    ====================================================== */
+
+    .period-section {
+
+        margin-bottom: 15px;
+
+    }
+
+
+    .period-heading {
+
+        align-items: center;
+
+    }
+
+
+    .view-all {
+
+        color: var(--putr-blue);
+
+        font-size: 9px;
+        font-weight: 700;
+
+        text-decoration: none;
+
+    }
+
+
+    .period-list {
+
+        display: grid;
+
+        gap: 8px;
+
+    }
+
 
     .period-card {
-        border: 1px solid #e5e7eb;
-        border-radius: 16px;
-        padding: 16px;
-    }
 
-    .period-top {
-        display: flex;
-        justify-content: space-between;
-        gap: 10px;
-    }
+        padding: 14px;
 
-    .period-top strong {
-        display: block;
-        font-size: 14px;
-        margin-bottom: 5px;
-    }
+        background: #fff;
 
-    .period-top small {
-        color: #6b7280;
-        font-size: 11px;
-    }
+        border: 1px solid var(--border);
 
-    .badge {
-        background: #dcfce7;
-        color: #15803d;
-        padding: 5px 8px;
-        border-radius: 6px;
-        font-size: 9px;
-        font-weight: bold;
-        height: fit-content;
-    }
-
-    .quota {
-        margin-top: 18px;
-    }
-
-    .quota-text {
-        display: flex;
-        justify-content: space-between;
-        font-size: 11px;
-        margin-bottom: 7px;
-    }
-
-    .quota-text span {
-        color: #6b7280;
-    }
-
-    .progress {
-        height: 7px;
-        background: #e5e7eb;
         border-radius: 10px;
+
+        box-shadow:
+            0 3px 9px rgba(16, 42, 67, .03);
+
+    }
+
+
+    .period-card-header {
+
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+
+        gap: 10px;
+
+    }
+
+
+    .period-title {
+
+        min-width: 0;
+
+    }
+
+
+    .period-title h3 {
+
         overflow: hidden;
+
+        color: var(--text);
+
+        font-size: 12px;
+        font-weight: 700;
+
+        white-space: nowrap;
+        text-overflow: ellipsis;
+
     }
 
-    .progress-bar {
-        width: 0%;
+
+    .period-title span {
+
+        display: block;
+
+        margin-top: 3px;
+
+        color: var(--text-secondary);
+
+        font-size: 9px;
+
+    }
+
+
+    .availability {
+
+        flex: 0 0 auto;
+
+        padding: 4px 7px;
+
+        border-radius: 4px;
+
+        font-size: 7px;
+        font-weight: 800;
+
+        letter-spacing: .035em;
+
+    }
+
+
+    .availability.available {
+
+        background: var(--success-bg);
+
+        color: var(--success);
+
+    }
+
+
+    .availability.full {
+
+        background: var(--danger-bg);
+
+        color: var(--danger);
+
+    }
+
+
+    .period-meta {
+
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        margin-top: 17px;
+        margin-bottom: 7px;
+
+    }
+
+
+    .period-meta > div {
+
+        display: flex;
+        align-items: center;
+
+        gap: 5px;
+
+    }
+
+
+    .period-meta span {
+
+        color: var(--text-muted);
+
+        font-size: 8px;
+
+    }
+
+
+    .period-meta strong {
+
+        color: var(--text-secondary);
+
+        font-size: 8px;
+        font-weight: 700;
+
+    }
+
+
+    .period-meta .percentage {
+
+        color: var(--putr-blue);
+
+        font-size: 9px;
+        font-weight: 750;
+
+    }
+
+
+    .progress-track {
+
+        width: 100%;
+        height: 5px;
+
+        overflow: hidden;
+
+        background: #E9EEF3;
+
+        border-radius: 3px;
+
+    }
+
+
+    .progress-value {
+
         height: 100%;
-        background: #2563eb;
+
+        background:
+            linear-gradient(
+                90deg,
+                var(--putr-blue-dark),
+                var(--putr-blue)
+            );
+
+        border-radius: 3px;
+
+        transition: width .3s ease;
+
     }
 
-    .badge.full {
-    background: #fee2e2;
-    color: #dc2626;
 
-    .search-form {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 18px;
-}
+    .progress-value.danger {
 
-.search-form input {
-    flex: 1;
-    padding: 12px 14px;
+        background: var(--danger);
 
-    border: 1px solid #e5e7eb;
-    border-radius: 10px;
+    }
 
-    font-size: 13px;
-    outline: none;
-}
 
-.search-form input:focus {
-    border-color: #2563eb;
-}
+    .period-footer {
 
-.search-form button {
-    width: 44px;
+        margin-top: 8px;
 
-    border: none;
-    border-radius: 10px;
+        color: var(--text-muted);
 
-    background: #2563eb;
-    color: white;
+        font-size: 8px;
 
-    cursor: pointer;
-}
-}
+    }
+
+
+    /* =====================================================
+       EMPTY STATE
+    ====================================================== */
+
+    .empty-period {
+
+        padding: 29px 18px;
+
+        text-align: center;
+
+        background: #fff;
+
+        border: 1px dashed #B8C7D6;
+
+        border-radius: 10px;
+
+    }
+
+
+    .empty-icon {
+
+        width: 40px;
+        height: 40px;
+
+        margin: 0 auto 10px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        background: #EDF2F6;
+
+        color: var(--text-secondary);
+
+        border-radius: 8px;
+
+    }
+
+
+    .empty-icon svg {
+
+        width: 18px;
+        height: 18px;
+
+    }
+
+
+    .empty-period strong {
+
+        display: block;
+
+        color: var(--text);
+
+        font-size: 11px;
+
+    }
+
+
+    .empty-period p {
+
+        max-width: 250px;
+
+        margin: 4px auto 12px;
+
+        color: var(--text-muted);
+
+        font-size: 9px;
+
+    }
+
+
+    .empty-period a {
+
+        color: var(--putr-blue);
+
+        font-size: 9px;
+        font-weight: 700;
+
+        text-decoration: none;
+
+    }
+
+
+    /* =====================================================
+       SMALL DEVICE
+    ====================================================== */
+
+    @media (max-width: 360px) {
+
+        .page-intro h1 {
+            font-size: 23px;
+        }
+
+        .summary-card {
+            min-height: 132px;
+            padding: 12px;
+        }
+
+        .summary-number {
+            font-size: 25px;
+        }
+
+    }
 
 </style>
+
 @endpush
+
+@endsection
